@@ -31,8 +31,6 @@ async def upload_func(project_id:str,file:UploadFile,app_settings:Settings = Dep
             }
         )
     
-    project_control = ProjectController()
-
     file_path,file_key = data_control.generate_unique_filepath(file,project_id)
 
     try :
