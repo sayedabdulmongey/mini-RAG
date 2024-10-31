@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     FILE_ALLOWED_SIZE : int
     FILE_DEFAULT_CHUNK : int
 
+    MONGO_URL : str
+    MONGO_DATABASE:str
+
     class Config:
         env_file = '.env'
 
