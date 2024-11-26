@@ -42,6 +42,6 @@ class DataController(BaseController):
     def clean_filename(self,filename:str):
 
 
-        cleaned_filename = re.sub(r'[^\w_.]', '', filename.strip())
+        cleaned_filename = re.sub(r'[^\w_.]', '', filename.strip()) # remove all special characters
 
         return cleaned_filename
