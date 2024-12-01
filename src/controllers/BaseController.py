@@ -3,10 +3,7 @@ import os
 import random
 import string
 class BaseController:
-
-
     def __init__(self):
-
         self.app_settings = get_settings()
         self.base_dir = os.path.dirname(os.path.dirname(__file__))
         print(self.base_dir)
