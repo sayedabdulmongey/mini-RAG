@@ -13,7 +13,7 @@ This is a minimal implementation of the RAG model for question answering.
 2. Create a new conda environment with the following command:
 
 ```bash
-conda create -n mini-rag python=3.8
+conda create -n mini-rag python=3.10.12
 ```
 
 3. Activate the environment:
@@ -41,6 +41,13 @@ cp .env.example .env
 ```
 
 **Set your environment variables in the `.env` file.**
+
+## Run the Docker container
+
+```bash
+cd docker
+docker-compose up
+```
 
 ## Run the FASTAPI server
 
