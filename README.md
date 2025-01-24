@@ -58,6 +58,6 @@ docker-compose up -d
 ## Run the FASTAPI server
 
 ```bash
-cd src
+cd ../src
 uvicorn main:app --host '0.0.0.0' --port 5000 --reload
 ```
