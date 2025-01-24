@@ -8,11 +8,6 @@ class ChunkModel(BaseDataModel):
 
     '''
     ChunkModel class is the data model for the chunks collection in the database
-    In this class, we have the following methods:
-    - create_chunk: to insert a new chunk into the chunks collection
-    - get_chunk: to retrieve a chunk from the chunks collection
-    - insert_many_chunks: to insert multiple chunks into the chunks collection
-    - delete_chunk_by_project_id: to delete all the chunks that belong to a project
     '''
 
     def __init__(self, db_client: object):

@@ -6,10 +6,6 @@ from .db_schemas import Project
 class ProjectModel(BaseDataModel):
     '''
     ProjectModel class is the data model for the projects collection in the database
-    In this class, we have the following methods:
-    - create_project: to insert a new project into the projects collection
-    - get_project_or_create_one: to retrieve a project from the projects collection or create a new one if it doesn't exist
-    - get_all_projects: to retrieve all the projects from the projects collection with pagination
     '''
 
     def __init__(self, db_client: object):
@@ -50,9 +46,9 @@ class ProjectModel(BaseDataModel):
         # exclude_unset=True: to exclude the fields that are not set in the schema which means the values that aren't provided in the project object will be equal to None
         # i do this because i solve problem with acces _id which is private attribute so i used alias to access it
 
-        project._id = result.inserted_id
+        project.id = result.inserted_id
 
-        return result
+        return project
 
     async def get_project_or_create_one(self, project_id: str):
 
@@ -64,9 +60,9 @@ class ProjectModel(BaseDataModel):
             # create new project
 
             project = Project(project_id=project_id)
-            records = await self.create_project(project=project)
+            project = await self.create_project(project=project)
 
-            return records
+            return project
 
         return Project(**records)
         # Because the records is a dictionary, we need to convert it to a Project object
