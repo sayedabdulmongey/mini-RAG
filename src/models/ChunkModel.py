@@ -19,6 +19,32 @@ class ChunkModel(BaseDataModel):
         super().__init__(db_client)
         self.collection = self.db_client[DataBaseEnum.COLLECTION_CHUNK_NAME.value]
 
+    @classmethod
+    async def create_instance(cls, db_client: object):
+        '''
+        I created this method because i want to call async method (init_collections) in the init but its not allowed to call async method in the init because its not awaitable
+        So i created this method to call the init method and the async method also 
+        '''
+        instance = cls(db_client)
+        await instance.init_collections()
+        return instance
+
+    async def init_collections(self):
+        '''
+        This method is used to initialize the collections in the database
+        The Initialization includes creating the indexes for the collections for the first time only
+        '''
+        all_collections = await self.db_client.list_collection_names()
+        indexes = DataChunk.get_indexes()
+        if DataBaseEnum.COLLECTION_CHUNK_NAME.value not in all_collections:
+
+            for index in indexes:
+                await self.collection.create_index(
+                    index['key'],
+                    name=index['name'],
+                    unique=index['unique']
+                )
+
     async def create_chunk(self, chunk: DataChunk):
 
         result = await self.collection.insert_one(chunk.dict(by_alias=True, exclude_unset=True))

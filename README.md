@@ -46,7 +46,13 @@ cp .env.example .env
 
 ```bash
 cd docker
-docker-compose up
+cp .env.example .env
+```
+
+**Update the `.env` file with your credentials.**
+
+```bash
+docker-compose up -d
 ```
 
 ## Run the FASTAPI server

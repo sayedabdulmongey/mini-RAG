@@ -24,3 +24,15 @@ class DataChunk(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+    @classmethod
+    def get_indexes(cls):
+        return [
+            {
+                'key': [
+                    ('chunk_project_id', 1)
+                ],  # means use chunk_project_id as an index and 1 means >> sort it ascending
+                'name': 'chunk_project_id_index_1',
+                'unique': False  # multiple chunks may belong to the same project id
+            }
+        ]
