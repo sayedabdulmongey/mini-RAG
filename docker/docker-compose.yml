@@ -1,14 +1,24 @@
 
 services:
   mongodb:
+
     image: mongo:4.4   # mongo >> image name, 4.4 >> version
+
     container_name: mongodb  # container name
+
     ports: 
       - "27027:27017" # host port:container port
+
     volumes: 
       - mongodb_data:/data/db # volume name:container path
+
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME={MONGO_INITDB_ROOT_USERNAME} # root username
+      - MONGO_INITDB_ROOT_PASSWORD={MONGO_INITDB_ROOT_PASSWORD} # root password
+
     networks: 
       - backend
+      
     restart: always # restart the container if it stops
 
 networks:
