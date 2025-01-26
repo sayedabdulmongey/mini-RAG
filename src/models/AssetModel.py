@@ -7,6 +7,13 @@ from bson import ObjectId
 class AssetModel(BaseDataModel):
     '''
     This class is the data model for the assets collection in the database
+
+    It has the following methods:
+    - create_instance: This method is a class method that creates an instance of the AssetModel class and initializes the collections with the indexes
+    - init_collections: This method is an async method that initializes the collections with the indexes
+    - create_asset: This method is an async method that creates a new asset in the database
+    - get_all_project_assets: This method is an async method that retrieves all the assets for a specific project
+    - get_asset_by_id: This method is an async method that retrieves an asset by its id
     '''
 
     def __init__(self, db_client: object):
@@ -46,9 +53,26 @@ class AssetModel(BaseDataModel):
 
         return asset
 
-    async def get_all_project_assets(self, project_id: str):
-        return self.collection.find(
+    async def get_all_project_assets(self, asset_project_id: str, asset_type: str):
+        asset_records = await self.collection.find(
             {
-                'asset_project_id': ObjectId(project_id) if isinstance(project_id, str) else project_id
+                'asset_project_id': ObjectId(asset_project_id) if isinstance(asset_project_id, str) else asset_project_id,
+                'asset_type': asset_type
             }
         ).to_list(length=None)  # to_list(length=None) length=None means return all the documents
+
+        return [
+            Asset(**record)
+            for record in asset_records
+        ]
+
+    async def get_asset_by_id(self, asset_project_id: str, asset_name: str):
+        asset_record = await self.collection.find_one(
+            {
+                'asset_project_id': ObjectId(asset_project_id) if isinstance(asset_project_id, str) else asset_project_id,
+                'asset_name': asset_name
+            }
+        )
+        if asset_record:
+            return Asset(**asset_record)
+        return None

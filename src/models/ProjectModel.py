@@ -6,6 +6,15 @@ from .db_schemas import Project
 class ProjectModel(BaseDataModel):
     '''
     ProjectModel class is the data model for the projects collection in the database
+    The class is responsible for all the operations related to the projects collection in the database
+    The class inherits from the BaseDataModel class which is responsible for the database connection
+
+    The class has the following methods:
+    - create_instance: This method is used to create an instance of the ProjectModel class and initialize the collections with the indexes
+    - init_collections: This method is used to initialize the collections in the database
+    - create_project: This method is used to create a new project in the database
+    - get_project_or_create_one: This method is used to get a project from the database by its id
+    - get_all_projects: This method is used to get all the projects from the database
     '''
 
     def __init__(self, db_client: object):

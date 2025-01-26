@@ -8,6 +8,16 @@ class ChunkModel(BaseDataModel):
 
     '''
     ChunkModel class is the data model for the chunks collection in the database
+    The class is responsible for all the operations related to the chunks collection in the database
+    The class inherits from the BaseDataModel class which is responsible for the database connection
+
+    The class has the following methods:
+    - create_instance: This method is used to create an instance of the ChunkModel class and initialize the collections with the indexes
+    - init_collections: This method is used to initialize the collections in the database
+    - create_chunk: This method is used to create a new chunk in the database
+    - get_chunk: This method is used to get a chunk from the database by its id
+    - insert_many_chunks: This method is used to insert multiple chunks into the database
+    - delete_chunk_by_project_id: This method is used to delete all the chunks related to a project from the database
     '''
 
     def __init__(self, db_client: object):
@@ -46,7 +56,7 @@ class ChunkModel(BaseDataModel):
         # by_alias=True: to use the alias name in the schema
         # exclude_unset=True: to exclude the fields that are not set in the schema which means the values that aren't provided in the project object will be equal to None
         # i do this because i solve problem with acces _id which is private attribute so i used alias to access it
-        chunk._id = result.inserted_id
+        chunk.id = result.inserted_id
 
         return result
 
@@ -87,7 +97,7 @@ class ChunkModel(BaseDataModel):
     async def delete_chunk_by_project_id(self, project_id: str):
 
         result = await self.collection.delete_many({
-            'project_id': project_id
+            'chunk_project_id': project_id
         })
 
         return result.deleted_count

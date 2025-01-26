@@ -13,8 +13,8 @@ services:
       - mongodb_data:/data/db # volume name:container path
 
     environment:
-      - MONGO_INITDB_ROOT_USERNAME={MONGO_INITDB_ROOT_USERNAME} # root username
-      - MONGO_INITDB_ROOT_PASSWORD={MONGO_INITDB_ROOT_PASSWORD} # root password
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME} # root username
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD} # root password
 
     networks: 
       - backend

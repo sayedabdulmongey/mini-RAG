@@ -17,7 +17,6 @@ class DataController(BaseController):
     generate_unique_filepath: This method generates a unique file path for the uploaded file
 
     clean_filename: This method cleans the filename by removing all special characters
-
     '''
 
     def __init__(self):
@@ -30,13 +29,15 @@ class DataController(BaseController):
         This method validates the uploaded file based on the file type and size
         Allowed file types and size are defined in the app settings
         '''
-        response_signals = ResponseSignal
+
         if file.content_type not in self.app_settings.FILE_ALLOWED_TYPES:
-            return False, response_signals.FILE_TYPE_NOT_SUPPORTED.value, file.content_type
+            return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value, file.content_type
+        
         # file.size >> byte , file_allowed_size >> mega byte
         if file.size > self.app_settings.FILE_ALLOWED_SIZE*self.size_convert:
-            return False, response_signals.FILE_SIZE_EXCEEDED.value, file.content_type
-        return True, response_signals.FILE_UPLOAD_SUCCESS.value, file.content_type
+            return False, ResponseSignal.FILE_SIZE_EXCEEDED.value, file.content_type
+        
+        return True, ResponseSignal.FILE_UPLOAD_SUCCESS.value, file.content_type
 
     def generate_unique_filepath(self, file: UploadFile, project_id: str):
 

@@ -6,11 +6,20 @@ from datetime import datetime
 
 class Asset(BaseModel):
 
+    '''
+    Asset Class for the FastAPI Application
+    In this class, we define the schema for the Asset collection in the MongoDB Database
+
+    It has the following methods:
+    get_indexes: This method returns the indexes for the Asset collection
+
+    '''
+
     id: Optional[ObjectId] = Field(None, alias='_id')
     asset_project_id: ObjectId
     asset_name: str = Field(..., min_length=1)
     asset_type: str = Field(..., min_length=1)
-    asset_size: int = Field(gt=0, default=None)
+    asset_size: int = Field(ge=0, default=None)
     asset_config: dict = Field(default=None)
     asset_pushed_at: str = Field(default=datetime.utcnow)
 

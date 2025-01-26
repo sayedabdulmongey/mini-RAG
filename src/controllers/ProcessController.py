@@ -26,9 +26,9 @@ class ProcessController(BaseController):
     '''
 
     def __init__(self, project_id: str):
+        super().__init__()
 
         self.project_id = project_id
-
         self.project_path = ProjectController().get_project_path(project_id=project_id)
 
     def get_file_extension(self, file_id: str):
@@ -40,6 +40,9 @@ class ProcessController(BaseController):
             self.project_path,
             file_id
         )
+
+        if not os.path.exists(self.file_path):
+            return None
 
         file_extension = self.get_file_extension(file_id=file_id)
 
@@ -58,7 +61,11 @@ class ProcessController(BaseController):
     def get_file_content(self, file_id: str):
 
         loader = self.get_file_loader(file_id=file_id)
-        return loader.load()
+
+        if loader:
+            return loader.load()
+
+        return None
 
     def get_file_chunks(self, file_content: list, file_id: str,
                         chunk_size: int = 100, overlap_len: int = 10):

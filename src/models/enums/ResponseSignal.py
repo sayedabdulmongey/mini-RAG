@@ -13,6 +13,8 @@ class ResponseSignal(Enum):
     - FILE_UPLOAD_FAILED: 'file_upload_failed'
     - PROCESS_FAILED: 'file_processing_failed'
     - PROCESS_SUCCESS: 'file_processing_success'
+    - FILE_PROCESS_FAILED: 'no_file_found'
+    - FILE_PROCESS_NOT_FOUND: 'no_file_found_with_this_id'
     '''
 
     FILE_VALIDATED_SUCCESS = "file_validate_successfully"
@@ -23,3 +25,6 @@ class ResponseSignal(Enum):
 
     PROCESS_FAILED = 'file_processing_failed'
     PROCESS_SUCCESS = 'file_processing_success'
+
+    FILE_PROCESS_FAILED = 'no_file_found'
+    FILE_PROCESS_NOT_FOUND = 'no_file_found_with_this_id'

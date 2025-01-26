@@ -7,6 +7,7 @@ class DataBaseEnum(Enum):
     It has the following attributes:
     COLLECTION_PROJECT_NAME: This attribute contains the name of the collection that stores the project data
     COLLECTION_CHUNK_NAME: This attribute contains the name of the collection that stores the chunk data
+    COLLECTION_ASSETS_NAME: This attribute contains the name of the collection that stores the asset data
     '''
     COLLECTION_PROJECT_NAME = 'projects'
     COLLECTION_CHUNK_NAME = 'chunks'

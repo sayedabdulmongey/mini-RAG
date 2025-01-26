@@ -9,7 +9,7 @@ class ProcessRequest(BaseModel):
     In this class, we define the schema for the Process Request for the FastAPI Application
     '''
 
-    file_id: str
+    file_id: str = None
     chunck_size: Optional[int] = 100
     overlap_size: Optional[int] = 10
     do_reset: Optional[bool] = False

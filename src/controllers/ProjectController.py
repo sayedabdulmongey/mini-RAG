@@ -10,7 +10,6 @@ class ProjectController(BaseController):
     It has the following methods:
 
     get_project_path: This method gets the project path based on the project id
-
     '''
 
     def __init__(self):

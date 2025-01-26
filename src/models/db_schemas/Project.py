@@ -7,6 +7,10 @@ class Project(BaseModel):
     '''
     Project Class for the FastAPI Application
     In this class, we define the schema for the Project collection in the MongoDB Database
+
+    It has the following methods:
+    get_indexes: This method returns the indexes for the Project collection
+
     '''
     id: Optional[ObjectId] = Field(None, alias='_id')
     # i used alias to rename the id field to _id to avoid conflicts with the default id field in the MongoDB collection and the private id field in the Project class
