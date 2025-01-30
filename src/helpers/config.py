@@ -18,6 +18,24 @@ class Settings(BaseSettings):
     MONGO_URL: str
     MONGO_DATABASE: str
 
+    GENERATION_BACKEND: str
+    EMBEDDING_BACKEND: str
+
+    COHERE_API_KEY: str
+
+    OPENAI_API_KEY: str
+    OPENAI_URL_BASE: str
+
+    GOOGLE_API_KEY: str
+
+    GENERATION_MODEL_ID: str
+    EMBEDDING_MODEL_ID: str
+    EMBEDDING_SIZE: int
+
+    DEFAULT_INPUT_MAX_CHARACTERS: int
+    DEFAULT_MAX_NEW_TOKENS: int
+    DEFAULT_TEMPERATURE: int
+
     class Config:
         env_file = '.env'
 
