@@ -1,21 +1,21 @@
 from enum import Enum
 
 
-class LLMEnum(Enum):
+class LLMEnums(Enum):
 
     OPENAI = 'OPENAI'
     GEMINI = 'GEMINI'
     COHERE = 'COHERE'
 
 
-class OpenAIEnum(Enum):
+class OpenAIEnums(Enum):
 
     USER = 'user'
     SYSTEM = 'developer'
     ASSISTANT = 'assistant'
 
 
-class CoHereEnum(Enum):
+class CoHereEnums(Enum):
 
     USER = 'user'
     SYSTEM = 'system'
@@ -25,7 +25,7 @@ class CoHereEnum(Enum):
     QUERY = 'search_query'
 
 
-class DocumentTypeEnum(Enum):
+class DocumentTypeEnums(Enum):
 
     DOCUMENT = 'document'
     QUERY = 'query'

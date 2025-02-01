@@ -1,4 +1,4 @@
-from .LLMEnum import LLMEnum
+from .LLMEnums import LLMEnums
 
 from providers import CoHereProvider, OpenAIProvider
 
