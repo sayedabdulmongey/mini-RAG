@@ -8,10 +8,8 @@ class Settings(BaseSettings):
     '''
     APP_NAME: str
     APP_VERSION: str
-    OPENAI_API_KEY: str
 
-    FILE_ALLOWED_TYPES: list = ['text/plain',
-                                'application/pdf']  # allowed types (txt, pdf)
+    FILE_ALLOWED_TYPES: list
     FILE_ALLOWED_SIZE: int
     FILE_DEFAULT_CHUNK: int
 
@@ -24,17 +22,19 @@ class Settings(BaseSettings):
     COHERE_API_KEY: str
 
     OPENAI_API_KEY: str
-    OPENAI_URL_BASE: str
-
-    GOOGLE_API_KEY: str
+    OPENAI_URL_BASE: str = None
 
     GENERATION_MODEL_ID: str
     EMBEDDING_MODEL_ID: str
     EMBEDDING_SIZE: int
 
-    DEFAULT_INPUT_MAX_CHARACTERS: int
-    DEFAULT_MAX_NEW_TOKENS: int
-    DEFAULT_TEMPERATURE: int
+    DEFAULT_INPUT_MAX_CHARACTERS: int = None
+    DEFAULT_MAX_NEW_TOKENS: int = None
+    DEFAULT_TEMPERATURE: float = None
+
+    VECTOR_DB_BACKEND: str
+    VECTOR_DB_PATH: str
+    VECTOR_DB_DISTANCE_METHOD: str
 
     class Config:
         env_file = '.env'
