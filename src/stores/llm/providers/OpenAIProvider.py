@@ -53,7 +53,7 @@ class OpenAIProvider(LLMInterface):
         chat_history.append(
             self.construct_prompt(
                 prompt=prompt,
-                role=OpenAIEnum.SYSTEM.value
+                role=OpenAIEnums.SYSTEM.value
             )
         )
 

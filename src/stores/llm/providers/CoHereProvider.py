@@ -1,6 +1,6 @@
+from cohere import ClientV2
 from ..LLMInterface import LLMInterface
 from ..LLMEnums import CoHereEnums, DocumentTypeEnums
-import cohere
 from logging import getLogger
 
 
@@ -22,7 +22,7 @@ class CoHereProvider(LLMInterface):
         self.embedding_model_id = None
         self.embedding_size = None
 
-        self.client = cohere.ClientV2(
+        self.client = ClientV2(
             api_key=self.api_key
         )
 
@@ -51,7 +51,7 @@ class CoHereProvider(LLMInterface):
         chat_history.append(
             self.construct_prompt(
                 prompt=prompt,
-                role=CoHereEnum.SYSTEM.value
+                role=CoHereEnums.SYSTEM.value
             )
         )
 
@@ -80,7 +80,7 @@ class CoHereProvider(LLMInterface):
             self.logger.error("Embedding model ID not set")
             return None
 
-        input_type = CoHereEnum.DOCUMENT.value if document_type == DocumentTypeEnum.DOCUMENT.value else CoHereEnum.QUERY.value
+        input_type = CoHereEnums.DOCUMENT.value if document_type == DocumentTypeEnums.DOCUMENT.value else CoHereEnums.QUERY.value
 
         response = self.client.embed(
             model=self.embedding_model_id,
