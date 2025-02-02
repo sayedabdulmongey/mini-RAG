@@ -6,8 +6,7 @@ from stores.llm import LLMFactoryProvider
 # perform operations on it (it is async and fast api is async so it is used to make the operations faster)
 
 from helpers.config import get_settings
-
-app = FastAPI()
+from contextlib import asynccontextmanager
 
 
 async def startup_db_client():
@@ -29,7 +28,8 @@ async def startup_db_client():
     app.embedding_model = llm_factory_provider.create_provider(
         provider=settings.EMBEDDING_BACKEND)
     app.embedding_model.set_embedding_model(
-        model_id=settings.EMBEDDING_MODEL_ID)
+        embedding_model_id=settings.EMBEDDING_MODEL_ID,
+        embedding_size=settings.EMBEDDING_SIZE)
 
 
 async def shutdown_db_client():
@@ -37,8 +37,17 @@ async def shutdown_db_client():
     app.mongo_conn.close()
 
 
-app.router.lifespan.on_startup.append(startup_db_client)
-app.router.lifespan.on_shutdown.append(shutdown_db_client)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await startup_db_client()
+    yield
+    await shutdown_db_client()
+
+
+app = FastAPI(lifespan=lifespan)
+
+# app.router.lifespan.on_startup.append(startup_db_client)
+# app.router.lifespan.on_shutdown.append(shutdown_db_client)
 
 app.include_router(base.base_router)
 app.include_router(data.data_router)
