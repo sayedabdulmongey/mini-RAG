@@ -8,3 +8,4 @@ langchain-core==0.3.21
 langchain-community==0.3.3
 openai==1.60.2
 cohere==5.13.11
+qdrant-client==1.13.2
