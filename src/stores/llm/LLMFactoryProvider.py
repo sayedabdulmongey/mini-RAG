@@ -1,6 +1,6 @@
 from .LLMEnums import LLMEnums
 
-from providers import CoHereProvider, OpenAIProvider
+from .providers import CoHereProvider, OpenAIProvider
 
 
 class LLMFactoryProvider:
@@ -10,21 +10,21 @@ class LLMFactoryProvider:
 
     def create_provider(self, provider: str):
 
-        if provider == LLMEnum.OPENAI.value:
+        if provider == LLMEnums.OPENAI.value:
             return OpenAIProvider(
-                self.config.OPENAI_API_KEY,
-                self.config.OPENAI_URL_BASE,
-                self.config.DEFAULT_INPUT_MAX_CHARACTERS,
-                self.config.DEFAULT_MAX_NEW_TOKENS,
-                self.config.DEFAULT_TEMPERATURE,
+                api_key=self.config.OPENAI_API_KEY,
+                base_url=self.config.OPENAI_URL_BASE,
+                default_max_input_characters=self.config.DEFAULT_INPUT_MAX_CHARACTERS,
+                default_max_output_tokens=self.config.DEFAULT_MAX_NEW_TOKENS,
+                default_temperature=self.config.DEFAULT_TEMPERATURE,
             )
 
-        elif provider == LLMEnum.COHERE.value:
+        elif provider == LLMEnums.COHERE.value:
             return CoHereProvider(
-                self.config.COHERE_API_KEY,
-                self.config.DEFAULT_INPUT_MAX_CHARACTERS,
-                self.config.DEFAULT_MAX_NEW_TOKENS,
-                self.config.DEFAULT_TEMPERATURE,
+                api_key=self.config.COHERE_API_KEY,
+                default_max_input_characters=self.config.DEFAULT_INPUT_MAX_CHARACTERS,
+                default_max_output_tokens=self.config.DEFAULT_MAX_NEW_TOKENS,
+                default_temperature=self.config.DEFAULT_TEMPERATURE,
             )
 
         return None
