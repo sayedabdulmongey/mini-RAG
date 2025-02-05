@@ -25,11 +25,7 @@ data_router = APIRouter(
 @data_router.post("/upload/{project_id}")
 async def upload_func(request: Request, project_id: str, file: UploadFile, app_settings: Settings = Depends(get_settings)):
 
-    project_model = await ProjectModel.create_instance(
-        db_client=request.app.db_client
-    )
-
-    project = await project_model.get_project_or_create_one(
+    project = await request.app.project_model.get_project_or_create_one(
         project_id=project_id
     )
 
@@ -97,11 +93,7 @@ async def proccess_func(request: Request, project_id: str, process_request: Proc
     overlap_len = process_request.overlap_size
     do_reset = process_request.do_reset
 
-    project_model = await ProjectModel.create_instance(
-        db_client=request.app.db_client
-    )
-
-    project = await project_model.get_project_or_create_one(
+    project = await request.app.project_model.get_project_or_create_one(
         project_id=project_id
     )
 
@@ -149,12 +141,8 @@ async def proccess_func(request: Request, project_id: str, process_request: Proc
             }
         )
 
-    chunk_model = await ChunkModel.create_instance(
-        db_client=request.app.db_client
-    )
-
     if do_reset is True:
-        _ = await chunk_model.delete_chunk_by_project_id(
+        _ = await request.app.chunk_model.delete_chunk_by_project_id(
             project_id=project.id
         )
 
@@ -193,7 +181,7 @@ async def proccess_func(request: Request, project_id: str, process_request: Proc
             for idx, chunk in enumerate(chunks)
         ]
 
-        total_chunks += await chunk_model.insert_many_chunks(
+        total_chunks += await request.app.chunk_model.insert_many_chunks(
             chunks=chunk_records
         )
         total_files += 1
