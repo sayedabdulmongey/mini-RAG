@@ -15,6 +15,13 @@ class ResponseSignal(Enum):
     - PROCESS_SUCCESS: 'file_processing_success'
     - FILE_PROCESS_FAILED: 'no_file_found'
     - FILE_PROCESS_NOT_FOUND: 'no_file_found_with_this_id'
+    - PROJECT_NOT_FOUND: 'project_not_found'
+    - CHUNK_INSERTION_TO_VECTORDB_FAILED: 'chunk_insertion_to_vectordb_failed'
+    - CHUNK_INSERTION_TO_VECTORDB_SUCCESS: 'chunk_insertion_to_vectordb_succeed'
+    - GET_PROJECT_INFO_FAILED: 'get_project_info_failed'
+    - GET_PROJECT_INFO_SUCCESS: 'get_project_info_succeed'
+    - VECTORDB_SEARCH_ERROR: 'vectordb_search_error'
+    - VECTORDB_SEARCH_SUCCESS: 'vectordb_search_success'
     '''
 
     FILE_VALIDATED_SUCCESS = "file_validate_successfully"
@@ -28,3 +35,14 @@ class ResponseSignal(Enum):
 
     FILE_PROCESS_FAILED = 'no_file_found'
     FILE_PROCESS_NOT_FOUND = 'no_file_found_with_this_id'
+
+    PROJECT_NOT_FOUND = 'project_not_found'
+
+    CHUNK_INSERTION_TO_VECTORDB_FAILED = 'chunk_insertion_to_vectordb_failed'
+    CHUNK_INSERTION_TO_VECTORDB_SUCCESS = 'chunk_insertion_to_vectordb_succeed'
+
+    GET_COLLECTION_INFO_FAILED = 'get_collection_info_failed'
+    GET_COLLECTION_INFO_SUCCESS = 'get_collection_info_succeed'
+
+    VECTORDB_SEARCH_ERROR = 'vectordb_search_error'
+    VECTORDB_SEARCH_SUCCESS = 'vectordb_search_success'
