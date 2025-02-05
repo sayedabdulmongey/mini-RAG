@@ -2,6 +2,7 @@ from .BaseDataModel import BaseDataModel
 from .enums.DataBaseEnum import DataBaseEnum
 from .db_schemas import DataChunk
 from pymongo import InsertOne
+from bson import ObjectId
 
 
 class ChunkModel(BaseDataModel):
@@ -18,6 +19,7 @@ class ChunkModel(BaseDataModel):
     - get_chunk: This method is used to get a chunk from the database by its id
     - insert_many_chunks: This method is used to insert multiple chunks into the database
     - delete_chunk_by_project_id: This method is used to delete all the chunks related to a project from the database
+    - get_project_chunks: This method is used to get all the chunks related to a project from the database with pagination 
     '''
 
     def __init__(self, db_client: object):
@@ -101,3 +103,17 @@ class ChunkModel(BaseDataModel):
         })
 
         return result.deleted_count
+
+    async def get_project_chunks(self, project_id: ObjectId, page_no: int = 1, page_size: int = 50):
+        records = await self.collection.find({
+            'chunk_project_id': project_id
+        }).skip(
+            (page_no-1)*page_size
+        ).limit(page_size).to_list(
+            length=None
+        )
+
+        return [
+            DataChunk(**record)
+            for record in records
+        ]
