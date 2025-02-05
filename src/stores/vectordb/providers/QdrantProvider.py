@@ -39,7 +39,7 @@ class QdrantProvider(VectorDBInterface):
 
     def delete_collection(self, collection_name: str):
         if self.is_collection_exist(collection_name=collection_name):
-            self.client.delete_collection(collection_name=collection_name)
+            return self.client.delete_collection(collection_name=collection_name)
 
     def create_collection(self, collection_name: str,
                           embedding_dim: int,
@@ -68,17 +68,17 @@ class QdrantProvider(VectorDBInterface):
                 f'Cannot insert record to non-existing collection: {collection_name}')
             return None
         try:
-            _ = self.client.upload_records(
+            _ = self.client.upsert(
                 collection_name=collection_name,
-                records=[
-                    {
-                        'id': vector_id,
-                        'vector': vector,
-                        'payload': {
-                            'text': text,
-                            'metadata': metadata
+                points=[
+                    PointStruct(
+                        id=vector_id,
+                        vector=vector,
+                        payload={
+                            "text": text,
+                            "metadata": metadata
                         }
-                    }
+                    )
                 ]
             )
         except Exception as e:
@@ -98,7 +98,7 @@ class QdrantProvider(VectorDBInterface):
             metadata = [None] * len(vectors)
 
         if not vector_ids:
-            vector_ids = [None] * len(vectors)
+            vector_ids = list(range(0, len(texts)))
 
         for i in range(0, len(vectors), batch_size):
 
@@ -107,18 +107,18 @@ class QdrantProvider(VectorDBInterface):
             metadata_batch = metadata[i:i+batch_size]
             vector_id_batch = vector_ids[i:i+batch_size]
             try:
-                _ = self.client.upload_records(
+                _ = self.client.upsert(
                     collection_name=collection_name,
-                    records=[
-                        {
-                            'id': vector_id_batch[idx],
-                            'vector': vector_batch[idx],
-                            'payload': {
-                                'text': text_batch[idx],
-                                'metadata': metadata_batch[idx]
+                    points=[
+                        PointStruct(
+                            id=vector_id_batch[idx],
+                            vector=vector_batch[idx],
+                            payload={
+                                "text": text_batch[idx],
+                                "metadata": metadata_batch[idx]
                             }
-                        }
-                        for idx in range(len(vector_batch))
+                        )
+                        for idx in range(len(text_batch))
                     ]
                 )
             except Exception as e:
