@@ -5,6 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 # perform operations on it (it is async and fast api is async so it is used to make the operations faster)
 
 from stores.llm import LLMFactoryProvider
+from stores.llm.templates import TemplateParser
 from stores.vectordb import VectorDBFactoryProvider
 
 from helpers.config import get_settings
@@ -51,6 +52,12 @@ async def startup_spam():
         provider=settings.VECTOR_DB_BACKEND
     )
     app.vectordb_client.connect()
+
+    # Template parser
+    app.template_parser = TemplateParser(
+        language=settings.PRIMARY_LANGUAGE,
+        default_language=settings.DEFAULT_LANGUAGE
+    )
 
 
 async def shutdown_spam():
