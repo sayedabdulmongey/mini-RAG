@@ -25,8 +25,11 @@ class OpenAIProvider(LLMInterface):
 
         self.client = OpenAI(
             api_key=self.api_key,
-            base_url=self.base_url
+            base_url=self.base_url if self.base_url and len(
+                self.base_url) else None
         )
+
+        self.enums = OpenAIEnums
 
         self.logger = getLogger(__name__)
 
@@ -53,7 +56,7 @@ class OpenAIProvider(LLMInterface):
         chat_history.append(
             self.construct_prompt(
                 prompt=prompt,
-                role=OpenAIEnums.SYSTEM.value
+                role=OpenAIEnums.USER.value
             )
         )
 

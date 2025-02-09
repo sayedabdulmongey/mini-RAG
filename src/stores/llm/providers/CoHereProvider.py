@@ -26,6 +26,8 @@ class CoHereProvider(LLMInterface):
             api_key=self.api_key
         )
 
+        self.enums = CoHereEnums
+
         self.logger = getLogger(__name__)
 
     def set_generation_model(self, model_id: str):
@@ -51,7 +53,7 @@ class CoHereProvider(LLMInterface):
         chat_history.append(
             self.construct_prompt(
                 prompt=prompt,
-                role=CoHereEnums.SYSTEM.value
+                role=CoHereEnums.USER.value
             )
         )
 
