@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from typing import List
 
 
 class Settings(BaseSettings):
@@ -9,7 +10,7 @@ class Settings(BaseSettings):
     APP_NAME: str
     APP_VERSION: str
 
-    FILE_ALLOWED_TYPES: list
+    FILE_ALLOWED_TYPES: List[str]
     FILE_ALLOWED_SIZE: int
     FILE_DEFAULT_CHUNK: int
 
@@ -24,6 +25,8 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
     OPENAI_URL_BASE: str = None
 
+    GOOGLE_API_KEY: str
+
     GENERATION_MODEL_ID: str
     EMBEDDING_MODEL_ID: str
     EMBEDDING_SIZE: int
@@ -35,6 +38,9 @@ class Settings(BaseSettings):
     VECTOR_DB_BACKEND: str
     VECTOR_DB_PATH: str
     VECTOR_DB_DISTANCE_METHOD: str
+
+    DEFAULT_LANGUAGE: str = 'en'
+    PRIMARY_LANGUAGE: str
 
     class Config:
         env_file = '.env'
