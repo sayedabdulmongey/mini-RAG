@@ -20,4 +20,4 @@ class SearchRequest(BaseModel):
     '''
 
     text: str
-    limit: Optional[int] = 10
+    limit: Optional[int] = 5
