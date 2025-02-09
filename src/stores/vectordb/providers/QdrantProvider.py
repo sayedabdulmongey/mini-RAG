@@ -4,6 +4,10 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from logging import getLogger
 
+from models.db_schemas import RetrievedDocument
+
+import os
+
 
 class QdrantProvider(VectorDBInterface):
 
@@ -129,8 +133,22 @@ class QdrantProvider(VectorDBInterface):
 
     def search_by_vector(self, vector: list, collection_name: str, top_k: int):
 
-        return self.client.search(
+        results = self.client.search(
             collection_name=collection_name,
             query_vector=vector,
             limit=top_k
         )
+
+        if not results or len(results) == 0:
+            return None
+
+        return [
+            RetrievedDocument(
+                **{
+                    'score': result.score,
+                    'text': result.payload['text'],
+                    'metadata': os.path.basename(result.payload['metadata']['source']).split('_', 1)[-1],
+                }
+            )
+            for result in results
+        ]
