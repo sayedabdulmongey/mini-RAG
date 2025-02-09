@@ -37,7 +37,8 @@ async def index_project(request: Request, project_id: str, push_request: PushReq
     nlp_controller = NLPController(
         vectordb_client=request.app.vectordb_client,
         generation_model=request.app.generation_model,
-        embedding_model=request.app.embedding_model
+        embedding_model=request.app.embedding_model,
+        template_parser=request.app.template_parser
     )
 
     has_records = True
@@ -105,7 +106,8 @@ async def index_info_project(request: Request, project_id: str):
     nlp_controller = NLPController(
         vectordb_client=request.app.vectordb_client,
         generation_model=request.app.generation_model,
-        embedding_model=request.app.embedding_model
+        embedding_model=request.app.embedding_model,
+        template_parser=request.app.template_parser
     )
 
     collection_info = nlp_controller.get_vector_db_info(
@@ -148,7 +150,8 @@ async def index_search_project(request: Request, project_id: str, search_request
     nlp_controller = NLPController(
         vectordb_client=request.app.vectordb_client,
         generation_model=request.app.generation_model,
-        embedding_model=request.app.embedding_model
+        embedding_model=request.app.embedding_model,
+        template_parser=request.app.template_parser
     )
 
     results = nlp_controller.search_vector_db_collection(
@@ -169,6 +172,57 @@ async def index_search_project(request: Request, project_id: str, search_request
         status_code=status.HTTP_200_OK,
         content={
             'signal': ResponseSignal.VECTORDB_SEARCH_SUCCESS.value,
-            'results': results
+            'results': [
+                result.dict()
+                for result in results
+            ]
+        }
+    )
+
+
+# nlp_index_answer
+@nlp_router.post("/index/answer/{project_id}")
+async def index_answer_project(request: Request, project_id: str, search_request: SearchRequest):
+
+    project = await request.app.project_model.get_project_or_create_one(
+        project_id=project_id
+    )
+
+    if not project:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                'signal': ResponseSignal.PROJECT_NOT_FOUND.value
+            }
+        )
+
+    nlp_controller = NLPController(
+        vectordb_client=request.app.vectordb_client,
+        generation_model=request.app.generation_model,
+        embedding_model=request.app.embedding_model,
+        template_parser=request.app.template_parser
+    )
+
+    full_prompt, chat_history, answer = nlp_controller.answer_rag_question(
+        project_id=project_id,
+        query=search_request.text,
+        limit=search_request.limit
+    )
+
+    if not answer:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                'signal': ResponseSignal.RAG_ANSWER_ERROR.value
+            }
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            'signal': ResponseSignal.RAG_ANSWER_SUCCESS.value,
+            'answer': answer,
+            'full_prompt': full_prompt,
+            'chat_history': chat_history
         }
     )
