@@ -4,7 +4,7 @@ from enum import Enum
 class LLMEnums(Enum):
 
     OPENAI = 'OPENAI'
-    GEMINI = 'GEMINI'
+    GOOGLE = 'GOOGLE'
     COHERE = 'COHERE'
 
 
@@ -29,3 +29,13 @@ class DocumentTypeEnums(Enum):
 
     DOCUMENT = 'document'
     QUERY = 'query'
+
+
+class GoogleEnums(Enum):
+
+    USER = 'user'
+    SYSTEM = 'developer'
+    ASSISTANT = 'assistant'
+
+    DOCUMENT = 'RETRIEVAL_DOCUMENT'
+    QUERY = 'RETRIEVAL_QUERY'

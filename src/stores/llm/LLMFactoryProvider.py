@@ -1,6 +1,6 @@
 from .LLMEnums import LLMEnums
 
-from .providers import CoHereProvider, OpenAIProvider
+from .providers import CoHereProvider, OpenAIProvider, GoogleProvider
 
 
 class LLMFactoryProvider:
@@ -26,5 +26,11 @@ class LLMFactoryProvider:
                 default_max_output_tokens=self.config.DEFAULT_MAX_NEW_TOKENS,
                 default_temperature=self.config.DEFAULT_TEMPERATURE,
             )
-
+        elif provider == LLMEnums.GOOGLE.value:
+            return GoogleProvider(
+                api_key=self.config.GOOGLE_API_KEY,
+                default_max_input_characters=self.config.DEFAULT_INPUT_MAX_CHARACTERS,
+                default_max_output_tokens=self.config.DEFAULT_MAX_NEW_TOKENS,
+                default_temperature=self.config.DEFAULT_TEMPERATURE,
+            )
         return None
