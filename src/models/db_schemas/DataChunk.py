@@ -40,3 +40,13 @@ class DataChunk(BaseModel):
                 'unique': False  # multiple chunks may belong to the same project id
             }
         ]
+
+
+class RetrievedDocument(BaseModel):
+    '''
+    RetrievedDocument Class for the FastAPI Application
+    In this class, we define the schema for the RetrievedDocument object
+    '''
+    text: str
+    score: float
+    metadata: str
