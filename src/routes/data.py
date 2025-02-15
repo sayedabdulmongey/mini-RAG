@@ -23,7 +23,7 @@ data_router = APIRouter(
 
 
 @data_router.post("/upload/{project_id}")
-async def upload_func(request: Request, project_id: str, file: UploadFile, app_settings: Settings = Depends(get_settings)):
+async def upload_func(request: Request, project_id: int, file: UploadFile, app_settings: Settings = Depends(get_settings)):
 
     project = await request.app.project_model.get_project_or_create_one(
         project_id=project_id
@@ -31,7 +31,7 @@ async def upload_func(request: Request, project_id: str, file: UploadFile, app_s
 
     data_control = DataController()
 
-    is_valid, response_signal, type = data_control.validate_uploaded_file(
+    is_valid, response_signal, type_ = data_control.validate_uploaded_file(
         file=file)
 
     if not is_valid:
@@ -39,7 +39,7 @@ async def upload_func(request: Request, project_id: str, file: UploadFile, app_s
             status_code=status.HTTP_400_BAD_REQUEST,
             content={
                 "signal": response_signal,
-                "type": type
+                "type": type_
             }
         )
 
@@ -66,7 +66,7 @@ async def upload_func(request: Request, project_id: str, file: UploadFile, app_s
     )
 
     asset = Asset(
-        asset_project_id=project.id,
+        asset_project_id=project.project_id,
         asset_name=file_key,
         asset_type=AssetTypeEnum.FILE.value,
         asset_size=os.path.getsize(file_path)
@@ -81,13 +81,13 @@ async def upload_func(request: Request, project_id: str, file: UploadFile, app_s
         content={
             'signal': ResponseSignal.FILE_UPLOAD_SUCCESS.value,
             'file_key': file_key,
-            # 'project_id': str(project.id)  # convert the ObjectId to string
+            'file_id': asset_record.asset_id
         }
     )
 
 
 @data_router.post("/process/{project_id}")
-async def proccess_func(request: Request, project_id: str, process_request: ProcessRequest):
+async def proccess_func(request: Request, project_id: int, process_request: ProcessRequest):
 
     chunk_size = process_request.chunck_size
     overlap_len = process_request.overlap_size
@@ -107,7 +107,7 @@ async def proccess_func(request: Request, project_id: str, process_request: Proc
 
     if process_request.file_id:
         asset_record = await asset_model.get_asset_by_id(
-            asset_project_id=project.id,
+            asset_project_id=project.project_id,
             asset_name=process_request.file_id
         )
 
@@ -120,16 +120,16 @@ async def proccess_func(request: Request, project_id: str, process_request: Proc
             )
 
         project_file_ids = {
-            asset_record.id: asset_record.asset_name
+            asset_record.asset_id: asset_record.asset_name
         }
     else:
         project_asset_records = await asset_model.get_all_project_assets(
-            asset_project_id=project.id,
+            asset_project_id=project.project_id,
             asset_type=AssetTypeEnum.FILE.value
         )
 
         project_file_ids = {
-            asset_record.id: asset_record.asset_name
+            asset_record.asset_id: asset_record.asset_name
             for asset_record in project_asset_records
         }
 
@@ -143,9 +143,9 @@ async def proccess_func(request: Request, project_id: str, process_request: Proc
 
     if do_reset is True:
         _ = await request.app.chunk_model.delete_chunk_by_project_id(
-            project_id=project.id
+            project_id=project.project_id
         )
-
+        
     total_files, total_chunks = 0, 0
 
     for asset_id, file_id in project_file_ids.items():
@@ -158,7 +158,6 @@ async def proccess_func(request: Request, project_id: str, process_request: Proc
 
         chunks = process_controller.get_file_chunks(
             file_content=file_content,
-            file_id=file_id,
             chunk_size=chunk_size,
             overlap_len=overlap_len
         )
@@ -173,9 +172,10 @@ async def proccess_func(request: Request, project_id: str, process_request: Proc
         chunk_records = [
             DataChunk(
                 chunk_text=chunk.page_content,
-                chunk_metadata=chunk.metadata,
+                chunk_metadata=process_controller.get_file_name_from_metadata(
+                    chunk.metadata),
                 chunk_order=idx+1,
-                chunk_project_id=project.id,
+                chunk_project_id=project.project_id,
                 chunk_asset_id=asset_id
             )
             for idx, chunk in enumerate(chunks)
