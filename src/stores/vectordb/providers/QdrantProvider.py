@@ -1,7 +1,7 @@
 from ..VectorDBInterface import VectorDBInterface
 from ..VectorDBEnums import VectorDBEnums, DistanceTypeEnums
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
+from qdrant_client.models import Distance, VectorParams, PointStruct, Record
 from logging import getLogger
 
 from models.db_schemas import RetrievedDocument
@@ -53,7 +53,7 @@ class QdrantProvider(VectorDBInterface):
             _ = self.delete_collection(collection_name=collection_name)
 
         if not self.is_collection_exist(collection_name=collection_name):
-            self.client.create_collection(
+            _ = self.client.create_collection(
                 collection_name=collection_name,
                 vectors_config=VectorParams(
                     size=embedding_dim,
@@ -72,11 +72,11 @@ class QdrantProvider(VectorDBInterface):
                 f'Cannot insert record to non-existing collection: {collection_name}')
             return None
         try:
-            _ = self.client.upsert(
+            _ = self.client.upload_records(
                 collection_name=collection_name,
-                points=[
-                    PointStruct(
-                        id=vector_id,
+                records=[
+                    Record(
+                        id=[vector_id],
                         vector=vector,
                         payload={
                             "text": text,
@@ -111,10 +111,10 @@ class QdrantProvider(VectorDBInterface):
             metadata_batch = metadata[i:i+batch_size]
             vector_id_batch = vector_ids[i:i+batch_size]
             try:
-                _ = self.client.upsert(
+                _ = self.client.upload_records(
                     collection_name=collection_name,
-                    points=[
-                        PointStruct(
+                    records=[
+                        Record(
                             id=vector_id_batch[idx],
                             vector=vector_batch[idx],
                             payload={
@@ -147,7 +147,7 @@ class QdrantProvider(VectorDBInterface):
                 **{
                     'score': result.score,
                     'text': result.payload['text'],
-                    'metadata': os.path.basename(result.payload['metadata']['source']).split('_', 1)[-1],
+                    'metadata': result.payload['metadata'],
                 }
             )
             for result in results
