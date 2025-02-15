@@ -3,26 +3,35 @@ services:
   mongodb:
 
     image: mongo:4.4   # mongo >> image name, 4.4 >> version
-
     container_name: mongodb  # container name
-
     ports: 
       - "27027:27017" # host port:container port
-
     volumes: 
       - mongodb_data:/data/db # volume name:container path
-
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME} # root username
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD} # root password
-
     networks: 
       - backend
-      
     restart: always # restart the container if it stops
+
+  pgvector:
+
+    image: pgvector/pgvector:0.8.0-pg17
+    container_name: pgvector
+    ports:
+      - "5450:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - backend
+    restart: always
 
 networks:
   backend:
 
 volumes:
   mongodb_data:
+  pgvector_data:
