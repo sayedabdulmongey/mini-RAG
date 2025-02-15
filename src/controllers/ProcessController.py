@@ -3,7 +3,7 @@ from .ProjectController import ProjectController
 import os
 from langchain_community.document_loaders import TextLoader, PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-# i used this one because its smart in splitting its split in appropriate positions like wait to close the brackets and so on ...
+# I used this one because its smart in splitting its split in appropriate positions like wait to close the brackets and so on ...
 
 from models import ProcessEnum
 
@@ -23,9 +23,11 @@ class ProcessController(BaseController):
 
     get_file_chunks: This method gets the chunks of the file content
 
+    get_file_name_from_metadata: This method gets the file name from the metadata
+
     '''
 
-    def __init__(self, project_id: str):
+    def __init__(self, project_id: int):
         super().__init__()
 
         self.project_id = project_id
@@ -33,6 +35,13 @@ class ProcessController(BaseController):
 
     def get_file_extension(self, file_id: str):
         return os.path.splitext(file_id)[-1]
+
+    def get_file_name_from_metadata(self, metadata: dict):
+        '''
+        This function extracts the file name from the metadata and from the source key
+        ex: source: 'home/user/Xvxj2DnWk6fbfKV_file.txt' => file.txt
+        '''
+        return os.path.basename(metadata['source']).split('_', 1)[-1]
 
     def get_file_loader(self, file_id: str):
 
@@ -67,7 +76,7 @@ class ProcessController(BaseController):
 
         return None
 
-    def get_file_chunks(self, file_content: list, file_id: str,
+    def get_file_chunks(self, file_content: list,
                         chunk_size: int = 100, overlap_len: int = 10):
 
         text_splitter = RecursiveCharacterTextSplitter(
