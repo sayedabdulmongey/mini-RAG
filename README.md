@@ -6,6 +6,13 @@ This is a minimal implementation of the RAG model for question answering.
 
 - Python >= 3.8
 
+## Install Dependencies (For Ubuntu)
+
+```bash
+sudo apt update
+sudo apt install libpq-dev gcc python3-dev
+```
+
 ## Installation
 
 1. Download and install MiniConda from [here](https://docs.anaconda.com/miniconda/#quick-command-line-install)
@@ -25,6 +32,7 @@ conda activate mini-rag
 4. Install the required packages:
 
 ```bash
+cd src
 pip install -r requirements.txt
 ```
 
@@ -42,10 +50,14 @@ cp .env.example .env
 
 **Set your environment variables in the `.env` file.**
 
+## Database Migrations
+
+For details on database migrations using Alembic, please refer to the README file located at `/src/models/db_schemas/miniRAG`.
+
 ## Run the Docker container
 
 ```bash
-cd docker
+cd ../docker
 cp .env.example .env
 ```
 
@@ -61,3 +73,7 @@ docker-compose up -d
 cd ../src
 uvicorn main:app --host '0.0.0.0' --port 5000 --reload
 ```
+
+## POSTMAN Collection
+
+You can download the POSTMAN collection for this project from `/src/assets/mini-RAG-app.postman_collection.json`.
