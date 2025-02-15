@@ -61,8 +61,6 @@ class GoogleProvider(LLMInterface):
         max_new_tokens = max_new_tokens if max_new_tokens else self.default_max_output_tokens
         temperature = temperature if temperature else self.default_temperature
 
-        print(chat_history)
-        print(self.generation_model_id)
 
         response = self.client.models.generate_content(
             model=self.generation_model_id,
@@ -109,7 +107,7 @@ class GoogleProvider(LLMInterface):
         return '\n'.join(
             [
                 f'role: {role}',
-                f'content: {self.process_text(prompt)}'
+                f'content: {prompt}'
             ]
         )
 
