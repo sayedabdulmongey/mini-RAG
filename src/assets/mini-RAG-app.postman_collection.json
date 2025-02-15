@@ -1,0 +1,239 @@
+{
+	"info": {
+		"_postman_id": "b3e8716a-adbc-4c6c-a875-7466cb0f3797",
+		"name": "mini-RAG app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39150731"
+	},
+	"item": [
+		{
+			"name": "welcome",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API}}/base/",
+					"host": [
+						"{{API}}"
+					],
+					"path": [
+						"base",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/media/deadlypoison/New Volume/Study/Artificial intelligence/Graduation Project/test_upload.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{API}}/base/data/upload/1",
+					"host": [
+						"{{API}}"
+					],
+					"path": [
+						"base",
+						"data",
+						"upload",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "process",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    // \"file_id\": \"4Z9BD8PmRMZXk1k_hoho.txt\",\n    \"do_reset\":1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API}}/base/data/process/1",
+					"host": [
+						"{{API}}"
+					],
+					"path": [
+						"base",
+						"data",
+						"process",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nlp_index_push",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"do_reset\" : 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API}}/base/nlp/index/push/1",
+					"host": [
+						"{{API}}"
+					],
+					"path": [
+						"base",
+						"nlp",
+						"index",
+						"push",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nlp_index_info",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API}}/base/nlp/index/info/1",
+					"host": [
+						"{{API}}"
+					],
+					"path": [
+						"base",
+						"nlp",
+						"index",
+						"info",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nlp_index_search",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\" : \"QUERY\",\n    \"limit\" : 5 \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API}}/base/nlp/index/search/1",
+					"host": [
+						"{{API}}"
+					],
+					"path": [
+						"base",
+						"nlp",
+						"index",
+						"search",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nlp_index_answer",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\" : \"What is Data Science??\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API}}/base/nlp/index/answer/1",
+					"host": [
+						"{{API}}"
+					],
+					"path": [
+						"base",
+						"nlp",
+						"index",
+						"answer",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "API",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		}
+	]
+}
