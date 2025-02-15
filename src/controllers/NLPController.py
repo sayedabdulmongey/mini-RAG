@@ -24,14 +24,14 @@ class NLPController(BaseController):
         self.embedding_model = embedding_model
         self.template_parser = template_parser
 
-    def create_collection_name(self, project_id: str):
+    def create_collection_name(self, project_id: int):
         return f'collection_{project_id}'.strip()
 
-    def reset_vector_db_collection(self, project_id: str):
+    def reset_vector_db_collection(self, project_id: int):
         collection_name = self.create_collection_name(project_id=project_id)
         return self.vectordb_client.delete_collection(collection_name=collection_name)
 
-    def get_vector_db_info(self, project_id: str):
+    def get_vector_db_info(self, project_id: int):
         collection_name = self.create_collection_name(project_id=project_id)
         collection_info = self.vectordb_client.get_collection_info(
             collection_name=collection_name)
@@ -40,7 +40,7 @@ class NLPController(BaseController):
             json.dumps(collection_info, default=lambda x: x.__dict__)
         )
 
-    def index_into_vector_db(self, project_id: str, chunks: List[DataChunk],
+    def index_into_vector_db(self, project_id: int, chunks: List[DataChunk],
                              chunk_ids: List[int],
                              do_reset: bool = False):
 
@@ -70,7 +70,7 @@ class NLPController(BaseController):
 
         return True
 
-    def search_vector_db_collection(self, project_id: str, text: str, limit: int = 10):
+    def search_vector_db_collection(self, project_id: int, text: str, limit: int = 10):
 
         collection_name = self.create_collection_name(project_id=project_id)
 
@@ -91,7 +91,7 @@ class NLPController(BaseController):
 
         return results
 
-    def answer_rag_question(self, project_id: str, query: str, limit: int = 10):
+    def answer_rag_question(self, project_id: int, query: str, limit: int = 10):
 
         full_prompt, chat_history, answer = None, None, None
 
@@ -116,7 +116,7 @@ class NLPController(BaseController):
                     key='document_prompt',
                     vars={
                         'doc_num': idx,
-                        'doc_content': doc.text,
+                        'doc_content': self.generation_model.process_text(doc.text),
                         'doc_metadata': doc.metadata
                     }
                 )
