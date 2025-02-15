@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from routes import base, data, nlp
-from motor.motor_asyncio import AsyncIOMotorClient
-# this motor client is used to connect to the mongodb database
-# perform operations on it (it is async and fast api is async so it is used to make the operations faster)
+
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 from stores.llm import LLMFactoryProvider
 from stores.llm.templates import TemplateParser
@@ -15,11 +15,20 @@ from models import ProjectModel, ChunkModel
 
 
 async def startup_spam():
-    # this func is used to make the connection to the mongodb database
+
     settings = get_settings()
 
-    app.mongo_conn = AsyncIOMotorClient(settings.MONGO_URL)
-    app.db_client = app.mongo_conn[settings.MONGO_DATABASE]
+    postgres_url = f"postgresql+psycopg://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DATABASE}"
+
+    app.db_engine = create_async_engine(
+        url=postgres_url,
+    )
+
+    app.db_client = sessionmaker(
+        app.db_engine,
+        class_=AsyncSession,
+        expire_on_commit=False
+    )
 
     llm_factory_provider = LLMFactoryProvider(config=settings)
     vectordb_factory_provider = VectorDBFactoryProvider(config=settings)
@@ -61,8 +70,8 @@ async def startup_spam():
 
 
 async def shutdown_spam():
-    # this func is used to close the connection to the mongodb database
-    app.mongo_conn.close()
+
+    await app.db_engine.dispose()
     app.vectordb_client.disconnect()
 
 
