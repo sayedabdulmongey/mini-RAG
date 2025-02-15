@@ -20,7 +20,7 @@ nlp_router = APIRouter(
 
 # nlp_index_push
 @nlp_router.post("/index/push/{project_id}")
-async def index_project(request: Request, project_id: str, push_request: PushRequest):
+async def index_project(request: Request, project_id: int, push_request: PushRequest):
 
     project = await request.app.project_model.get_project_or_create_one(
         project_id=project_id
@@ -49,14 +49,15 @@ async def index_project(request: Request, project_id: str, push_request: PushReq
     while has_records:
 
         chunks = await request.app.chunk_model.get_project_chunks(
-            project_id=project.id,
+            project_id=project.project_id,
             page_no=page_no
         )
         if chunks:
             page_no += 1
 
-        if not chunks:
+        if not chunks or len(chunks) == 0:
             has_records = False
+            break
 
         chunk_ids = list(range(ids, ids+len(chunks)))
         ids += len(chunks)
@@ -89,7 +90,7 @@ async def index_project(request: Request, project_id: str, push_request: PushReq
 
 # nlp_index_info
 @nlp_router.get("/index/info/{project_id}")
-async def index_info_project(request: Request, project_id: str):
+async def index_info_project(request: Request, project_id: int):
 
     project = await request.app.project_model.get_project_or_create_one(
         project_id=project_id
@@ -133,7 +134,7 @@ async def index_info_project(request: Request, project_id: str):
 
 # nlp_index_search
 @nlp_router.post("/index/search/{project_id}")
-async def index_search_project(request: Request, project_id: str, search_request: SearchRequest):
+async def index_search_project(request: Request, project_id: int, search_request: SearchRequest):
 
     project = await request.app.project_model.get_project_or_create_one(
         project_id=project_id
@@ -182,7 +183,7 @@ async def index_search_project(request: Request, project_id: str, search_request
 
 # nlp_index_answer
 @nlp_router.post("/index/answer/{project_id}")
-async def index_answer_project(request: Request, project_id: str, search_request: SearchRequest):
+async def index_answer_project(request: Request, project_id: int, search_request: SearchRequest):
 
     project = await request.app.project_model.get_project_or_create_one(
         project_id=project_id
