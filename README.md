@@ -76,4 +76,4 @@ uvicorn main:app --host '0.0.0.0' --port 5000 --reload
 
 ## POSTMAN Collection
 
-You can download the POSTMAN collection for this project from `/src/assets/mini-RAG-app.postman_collection.json`.
+You can download the POSTMAN collection for this project from [here](/src/assets/mini-RAG-app.postman_collection.json).
