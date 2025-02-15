@@ -52,7 +52,7 @@ cp .env.example .env
 
 ## Database Migrations
 
-For details on database migrations using Alembic, please refer to the README file located at `/src/models/db_schemas/miniRAG`.
+For details on database migrations using Alembic, please refer to the [README file](../src/models/db_schemas/miniRAG).
 
 ## Run the Docker container
 
