@@ -1,6 +1,0 @@
-{
-    "python.languageServer": "Pylance",
-    "workbench.editor.limit.enabled": false,
-    "workbench.editor.limit.perEditorGroup": false,
-    "workbench.editor.limit.value": 15
-}
