@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, UploadFile, status, Request
 from fastapi.responses import JSONResponse
 import os
 from helpers import get_settings, Settings
-from controllers import DataController, ProjectController, ProcessController
+from controllers import DataController, ProjectController, ProcessController, NLPController
 from models import ResponseSignal, ProjectModel, ChunkModel, AssetModel
 import aiofiles
 import logging
@@ -87,9 +87,9 @@ async def upload_func(request: Request, project_id: int, file: UploadFile, app_s
 
 
 @data_router.post("/process/{project_id}")
-async def proccess_func(request: Request, project_id: int, process_request: ProcessRequest):
+async def process_func(request: Request, project_id: int, process_request: ProcessRequest):
 
-    chunk_size = process_request.chunck_size
+    chunk_size = process_request.chunk_size
     overlap_len = process_request.overlap_size
     do_reset = process_request.do_reset
 
@@ -98,6 +98,13 @@ async def proccess_func(request: Request, project_id: int, process_request: Proc
     )
 
     process_controller = ProcessController(project_id)
+
+    nlp_controller = NLPController(
+        vectordb_client=request.app.vectordb_client,
+        generation_model=request.app.generation_model,
+        embedding_model=request.app.embedding_model,
+        template_parser=request.app.template_parser
+    )
 
     asset_model = await AssetModel.create_instance(
         db_client=request.app.db_client
@@ -142,10 +149,21 @@ async def proccess_func(request: Request, project_id: int, process_request: Proc
         )
 
     if do_reset is True:
+
+        collection_name = nlp_controller.create_collection_name(
+            project_id=project.project_id)
+
+        logger.info(
+            f"Resetting vector database and deleting chunks for project ID: {project_id} with collection name: {collection_name}")
+
+        # Delete vectors from vector database
+        _ = await request.app.vectordb_client.delete_collection(collection_name)
+
+        # Delete chunks from database
         _ = await request.app.chunk_model.delete_chunk_by_project_id(
             project_id=project.project_id
         )
-        
+
     total_files, total_chunks = 0, 0
 
     for asset_id, file_id in project_file_ids.items():
@@ -172,8 +190,7 @@ async def proccess_func(request: Request, project_id: int, process_request: Proc
         chunk_records = [
             DataChunk(
                 chunk_text=chunk.page_content,
-                chunk_metadata=process_controller.get_file_name_from_metadata(
-                    chunk.metadata),
+                chunk_metadata=chunk.metadata,
                 chunk_order=idx+1,
                 chunk_project_id=project.project_id,
                 chunk_asset_id=asset_id

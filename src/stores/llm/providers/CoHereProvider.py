@@ -1,3 +1,5 @@
+
+from typing import Union
 from cohere import ClientV2
 from ..LLMInterface import LLMInterface
 from ..LLMEnums import CoHereEnums, DocumentTypeEnums
@@ -73,7 +75,7 @@ class CoHereProvider(LLMInterface):
 
         return response.message.content[0].text
 
-    def get_embedding(self, text: str, document_type: str = None):
+    def get_embedding(self, text: Union[str, list[str]], document_type: str = None):
         if not self.client:
             self.logger.error("Cohere client not initialized")
             return None
@@ -86,7 +88,7 @@ class CoHereProvider(LLMInterface):
 
         response = self.client.embed(
             model=self.embedding_model_id,
-            texts=[self.process_text(text)],
+            texts=self.process_text(text),
             input_type=input_type,
             embedding_types=["float"]
         )
@@ -94,7 +96,8 @@ class CoHereProvider(LLMInterface):
             self.logger.error("Error in Cohere Embedding response")
             return None
 
-        return response.embeddings.float[0]
+        # Return all embeddings as a list
+        return response.embeddings.float
 
     def construct_prompt(self, prompt, role):
         return {
@@ -102,5 +105,12 @@ class CoHereProvider(LLMInterface):
             'content': prompt
         }
 
-    def process_text(self, text):
-        return text[:self.default_max_input_characters].strip()
+    def process_text(self, text: Union[str, list[str]]) -> list:
+        if isinstance(text, str):
+            return [text[:self.default_max_input_characters].strip()]
+        elif isinstance(text, list):
+            return [t[:self.default_max_input_characters].strip() for t in text]
+        else:
+            self.logger.error(
+                "Input to process_text must be a string or list of strings")
+            return []

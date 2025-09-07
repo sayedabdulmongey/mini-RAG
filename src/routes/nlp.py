@@ -8,6 +8,8 @@ from .schemas import PushRequest, SearchRequest
 from controllers import NLPController
 from models.enums import ResponseSignal
 
+from tqdm.auto import tqdm
+
 
 logger = logging.getLogger('uvicorn.error')
 
@@ -34,17 +36,24 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
             }
         )
 
-    nlp_controller = NLPController(
-        vectordb_client=request.app.vectordb_client,
-        generation_model=request.app.generation_model,
-        embedding_model=request.app.embedding_model,
-        template_parser=request.app.template_parser
+    nlp_controller = request.app.nlp_controller
+
+    total_chunks_count = await request.app.chunk_model.get_total_chunks_count(
+        project_id=project.project_id
+    )
+
+    pbar = tqdm(
+        total=total_chunks_count,
+        desc=f"Indexing project {project.project_id} into vector database",
+        unit="chunks",
+        position=0,
     )
 
     has_records = True
     inserted_chunks = 0
     ids = 0
     page_no = 1
+    reset_requested = push_request.do_reset
 
     while has_records:
 
@@ -59,15 +68,16 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
             has_records = False
             break
 
-        chunk_ids = list(range(ids, ids+len(chunks)))
+        chunk_ids = [c.chunk_id for c in chunks]
         ids += len(chunks)
 
-        is_inserted = nlp_controller.index_into_vector_db(
+        is_inserted = await nlp_controller.index_into_vector_db(
             project_id=project_id,
             chunks=chunks,
             chunk_ids=chunk_ids,
-            do_reset=push_request.do_reset
+            do_reset=reset_requested
         )
+        reset_requested = False
 
         if not is_inserted:
             return JSONResponse(
@@ -76,6 +86,8 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
                     'signal': ResponseSignal.CHUNK_INSERTION_TO_VECTORDB_FAILED.value
                 }
             )
+
+        pbar.update(len(chunks))
 
         inserted_chunks += len(chunks)
 
@@ -104,14 +116,9 @@ async def index_info_project(request: Request, project_id: int):
             }
         )
 
-    nlp_controller = NLPController(
-        vectordb_client=request.app.vectordb_client,
-        generation_model=request.app.generation_model,
-        embedding_model=request.app.embedding_model,
-        template_parser=request.app.template_parser
-    )
+    nlp_controller = request.app.nlp_controller
 
-    collection_info = nlp_controller.get_vector_db_info(
+    collection_info = await nlp_controller.get_vector_db_info(
         project_id=project_id
     )
 
@@ -148,14 +155,9 @@ async def index_search_project(request: Request, project_id: int, search_request
             }
         )
 
-    nlp_controller = NLPController(
-        vectordb_client=request.app.vectordb_client,
-        generation_model=request.app.generation_model,
-        embedding_model=request.app.embedding_model,
-        template_parser=request.app.template_parser
-    )
+    nlp_controller = request.app.nlp_controller
 
-    results = nlp_controller.search_vector_db_collection(
+    results = await nlp_controller.search_vector_db_collection(
         project_id=project_id,
         text=search_request.text,
         limit=search_request.limit
@@ -197,14 +199,9 @@ async def index_answer_project(request: Request, project_id: int, search_request
             }
         )
 
-    nlp_controller = NLPController(
-        vectordb_client=request.app.vectordb_client,
-        generation_model=request.app.generation_model,
-        embedding_model=request.app.embedding_model,
-        template_parser=request.app.template_parser
-    )
+    nlp_controller = request.app.nlp_controller
 
-    full_prompt, chat_history, answer = nlp_controller.answer_rag_question(
+    full_prompt, chat_history, answer = await nlp_controller.answer_rag_question(
         project_id=project_id,
         query=search_request.text,
         limit=search_request.limit

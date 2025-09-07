@@ -3,6 +3,8 @@ from ..LLMInterface import LLMInterface
 from ..LLMEnums import LLMEnums, OpenAIEnums
 from logging import getLogger
 
+from typing import Union, List
+
 
 class OpenAIProvider(LLMInterface):
 
@@ -76,7 +78,7 @@ class OpenAIProvider(LLMInterface):
 
         return response.choices[0].message.content
 
-    def get_embedding(self, text: str, document_type: str = None):
+    def get_embedding(self, text: Union[str, List[str]], document_type: str = None):
         if not self.client:
             self.logger.error("OpenAI client not initialized")
             return None
@@ -89,10 +91,12 @@ class OpenAIProvider(LLMInterface):
             model=self.embedding_model_id,
             input=self.process_text(text)
         )
-        if not response or not response.data or len(response.data) == 0 or not response.data[0].embedding:
+        if not response or not response.data or len(response.data) == 0:
             self.logger.error("Error in OpenAI Embedding response")
             return None
-        return response.data[0].embedding
+
+        # Return all embeddings as a list
+        return [item.embedding for item in response.data]
 
     def construct_prompt(self, prompt: str, role: str):
         return {
@@ -100,5 +104,12 @@ class OpenAIProvider(LLMInterface):
             'content': prompt
         }
 
-    def process_text(self, text: str):
-        return text[:self.default_max_input_characters].strip()
+    def process_text(self, text: Union[str, list[str]]) -> list:
+        if isinstance(text, str):
+            return [text[:self.default_max_input_characters].strip()]
+        elif isinstance(text, list):
+            return [t[:self.default_max_input_characters].strip() for t in text]
+        else:
+            self.logger.error(
+                "Input to process_text must be a string or list of strings")
+            return []

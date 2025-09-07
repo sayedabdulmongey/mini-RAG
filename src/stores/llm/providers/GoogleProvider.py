@@ -4,6 +4,8 @@ from ..LLMInterface import LLMInterface
 from ..LLMEnums import GoogleEnums, DocumentTypeEnums
 from logging import getLogger
 
+from typing import Union, List
+
 
 class GoogleProvider(LLMInterface):
 
@@ -61,7 +63,6 @@ class GoogleProvider(LLMInterface):
         max_new_tokens = max_new_tokens if max_new_tokens else self.default_max_output_tokens
         temperature = temperature if temperature else self.default_temperature
 
-
         response = self.client.models.generate_content(
             model=self.generation_model_id,
             contents=chat_history,
@@ -71,13 +72,16 @@ class GoogleProvider(LLMInterface):
             }
         )
 
+        print(chat_history)
+        print(self.generation_model_id)
+
         if not response or not response.text:
             self.logger.error("Error in Gemini text generation response")
             return None
 
         return response.text
 
-    def get_embedding(self, text: str, document_type: str = None):
+    def get_embedding(self, text: Union[str, List[str]], document_type: str = None):
 
         if not self.client:
             self.logger.error("Google client not initialized")
@@ -101,7 +105,7 @@ class GoogleProvider(LLMInterface):
             self.logger.error("Error in Google Embedding response")
             return None
 
-        return response.embeddings[0].values
+        return [embed.values for embed in response.embeddings]
 
     def construct_prompt(self, prompt, role):
         return '\n'.join(
@@ -111,5 +115,12 @@ class GoogleProvider(LLMInterface):
             ]
         )
 
-    def process_text(self, text):
-        return text[:self.default_max_input_characters].strip()
+    def process_text(self, text: Union[str, list[str]]) -> list:
+        if isinstance(text, str):
+            return [text[:self.default_max_input_characters].strip()]
+        elif isinstance(text, list):
+            return [t[:self.default_max_input_characters].strip() for t in text]
+        else:
+            self.logger.error(
+                "Input to process_text must be a string or list of strings")
+            return []

@@ -8,51 +8,61 @@ from models.db_schemas import RetrievedDocument
 
 import os
 
+from typing import List
 
 class QdrantProvider(VectorDBInterface):
 
-    def __init__(self, db_path: str, distance_method: str):
+    def __init__(self, 
+                 db_client: str, 
+                 distance_method: str,
+                 embedding_size: int = 768,
+                 index_threshold: int = 100):
 
         self.client = None
 
-        self.db_path = db_path
+        self.db_client = db_client
 
         self.distance_method = None
+
+        self.embedding_size=embedding_size
 
         if distance_method == DistanceTypeEnums.COSINE.value:
             self.distance_method = Distance.COSINE
         elif distance_method == DistanceTypeEnums.DOT.value:
             self.distance_method = Distance.DOT
 
-        self.logger = getLogger(__name__)
+        self.logger = getLogger('uvicorn')
 
-    def connect(self):
-        self.client = QdrantClient(path=self.db_path)
+    async def connect(self):
+        self.client = QdrantClient(path=self.db_client)
 
-    def disconnect(self):
+    async def disconnect(self):
         self.client = None
 
-    def is_collection_exist(self, collection_name: str):
+    async def is_collection_exist(self, collection_name: str):
         return self.client.collection_exists(collection_name=collection_name)
 
-    def list_collections(self):
+    async def list_collections(self):
         return self.client.get_collections()
 
-    def get_collection_info(self, collection_name: str):
+    async def get_collection_info(self, collection_name: str):
         return self.client.get_collection(collection_name=collection_name)
 
-    def delete_collection(self, collection_name: str):
+    async def delete_collection(self, collection_name: str):
         if self.is_collection_exist(collection_name=collection_name):
             return self.client.delete_collection(collection_name=collection_name)
 
-    def create_collection(self, collection_name: str,
-                          embedding_dim: int,
-                          do_reset: bool = False):
+    async def create_collection(self, collection_name: str,
+                                embedding_dim: int,
+                                do_reset: bool = False):
 
         if do_reset:
-            _ = self.delete_collection(collection_name=collection_name)
+            self.logger.info(f"Reset flag is True. Deleting collection '{collection_name}' if it exists.")
+            _ = await self.delete_collection(collection_name=collection_name)
 
-        if not self.is_collection_exist(collection_name=collection_name):
+        exists = await self.is_collection_exist(collection_name=collection_name)
+        if not exists:
+            self.logger.info(f"Collection '{collection_name}' does not exist. Creating new collection.")
             _ = self.client.create_collection(
                 collection_name=collection_name,
                 vectors_config=VectorParams(
@@ -60,12 +70,14 @@ class QdrantProvider(VectorDBInterface):
                     distance=self.distance_method
                 ),
             )
+            self.logger.info(f"Collection '{collection_name}' created successfully.")
             return True
-
+        else:
+            self.logger.info(f"Collection '{collection_name}' already exists. No action taken.")
         return False
 
-    def insert_one(self, collection_name: str, vector: list,
-                   text: str, metadata: str = None, vector_id: str = None):
+    async def insert_one(self, collection_name: str, vector: List,
+                         text: str, metadata: str = None, vector_id: str = None):
 
         if not self.is_collection_exist(collection_name=collection_name):
             self.logger.error(
@@ -90,8 +102,8 @@ class QdrantProvider(VectorDBInterface):
             return False
         return True
 
-    def insert_batch(self, collection_name: str, vectors: list,
-                     texts: list, metadata: list = None, vector_ids: list = None, batch_size: int = 80):
+    async def insert_batch(self, collection_name: str, vectors: List,
+                           texts: List, metadata: List = None, vector_ids: List = None, batch_size: int = 80):
 
         if not self.is_collection_exist(collection_name=collection_name):
             self.logger.error(
@@ -131,7 +143,7 @@ class QdrantProvider(VectorDBInterface):
 
             return True
 
-    def search_by_vector(self, vector: list, collection_name: str, top_k: int):
+    async def search_by_vector(self, vector: list, collection_name: str, top_k: int):
 
         results = self.client.search(
             collection_name=collection_name,

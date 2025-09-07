@@ -10,6 +10,6 @@ class ProcessRequest(BaseModel):
     '''
 
     file_id: str = None
-    chunck_size: Optional[int] = 100
-    overlap_size: Optional[int] = 10
+    chunk_size: Optional[int] = 1024
+    overlap_size: Optional[int] = 205
     do_reset: Optional[bool] = False

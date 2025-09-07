@@ -38,9 +38,11 @@ class Settings(BaseSettings):
     DEFAULT_MAX_NEW_TOKENS: int = None
     DEFAULT_TEMPERATURE: float = None
 
+    VECTOR_DB_BACKEND_LITERAL: List[str] = None
     VECTOR_DB_BACKEND: str
     VECTOR_DB_PATH: str
     VECTOR_DB_DISTANCE_METHOD: str
+    VECTOR_DB_PG_INDEXING_THRESHOLD: int
 
     DEFAULT_LANGUAGE: str = 'en'
     PRIMARY_LANGUAGE: str

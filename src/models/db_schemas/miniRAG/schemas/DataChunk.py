@@ -1,12 +1,14 @@
 from .miniRAG_base import SQLAlchemyBase
 
-from sqlalchemy import Column, Integer, DateTime, func, String, ForeignKey
+from sqlalchemy import Column, Integer, DateTime, func, String, ForeignKey, JSON
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy import Index
 import uuid
 
 from pydantic import BaseModel
+
+from typing import Dict
 
 
 class DataChunk(SQLAlchemyBase):
@@ -18,7 +20,7 @@ class DataChunk(SQLAlchemyBase):
                         unique=True, nullable=False)
 
     chunk_text = Column(String, nullable=False)
-    chunk_metadata = Column(String, nullable=True)
+    chunk_metadata = Column(JSONB, nullable=True)
     chunk_order = Column(Integer, nullable=False)
 
     chunk_project_id = Column(Integer, ForeignKey(
@@ -47,4 +49,4 @@ class RetrievedDocument(BaseModel):
     '''
     text: str
     score: float
-    metadata: str
+    metadata: Dict = None

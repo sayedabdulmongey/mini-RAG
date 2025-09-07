@@ -13,6 +13,8 @@ from contextlib import asynccontextmanager
 
 from models import ProjectModel, ChunkModel
 
+from controllers import NLPController
+
 
 async def startup_spam():
 
@@ -31,7 +33,10 @@ async def startup_spam():
     )
 
     llm_factory_provider = LLMFactoryProvider(config=settings)
-    vectordb_factory_provider = VectorDBFactoryProvider(config=settings)
+    vectordb_factory_provider = VectorDBFactoryProvider(
+        config=settings,
+        db_client=app.db_client
+    )
 
     # Project model
     app.project_model = await ProjectModel.create_instance(
@@ -60,7 +65,7 @@ async def startup_spam():
     app.vectordb_client = vectordb_factory_provider.create_provider(
         provider=settings.VECTOR_DB_BACKEND
     )
-    app.vectordb_client.connect()
+    await app.vectordb_client.connect()
 
     # Template parser
     app.template_parser = TemplateParser(
@@ -68,11 +73,19 @@ async def startup_spam():
         default_language=settings.DEFAULT_LANGUAGE
     )
 
+    # NLP Controller
+    app.nlp_controller = NLPController(
+        vectordb_client=app.vectordb_client,
+        generation_model=app.generation_model,
+        embedding_model=app.embedding_model,
+        template_parser=app.template_parser
+    )
+
 
 async def shutdown_spam():
 
     await app.db_engine.dispose()
-    app.vectordb_client.disconnect()
+    await app.vectordb_client.disconnect()
 
 
 @asynccontextmanager

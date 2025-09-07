@@ -37,15 +37,15 @@ class VectorDBInterface(ABC):
         pass
 
     @abstractmethod
-    def insert_one(self, collection_name: str, vector: list,
+    def insert_one(self, collection_name: str, vector: List,
                    text: str, metadata: str = None, vector_id: str = None):
         pass
 
     @abstractmethod
-    def insert_batch(self, collection_name: str, vectors: list,
-                     texts: list, metadata: list = None, vector_ids: list = None, batch_size: int = 80):
+    def insert_batch(self, collection_name: str, vectors: List,
+                     texts: List, metadata: List = None, vector_ids: List = None, batch_size: int = 80):
         pass
 
     @abstractmethod
-    def search_by_vector(self, vector: list, collection_name: str, top_k: int) -> List[RetrievedDocument]:
+    def search_by_vector(self, vector: List, collection_name: str, top_k: int) -> List[RetrievedDocument]:
         pass

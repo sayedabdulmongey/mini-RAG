@@ -10,6 +10,8 @@ from stores.llm.LLMEnums import DocumentTypeEnums
 import json
 from typing import List
 
+from logging import getLogger
+
 
 class NLPController(BaseController):
 
@@ -24,43 +26,42 @@ class NLPController(BaseController):
         self.embedding_model = embedding_model
         self.template_parser = template_parser
 
+        self.logger = getLogger('uvicorn')
+
     def create_collection_name(self, project_id: int):
-        return f'collection_{project_id}'.strip()
+        return f'collection_{self.vectordb_client.embedding_size}_{project_id}'.strip()
 
-    def reset_vector_db_collection(self, project_id: int):
+    async def reset_vector_db_collection(self, project_id: int):
         collection_name = self.create_collection_name(project_id=project_id)
-        return self.vectordb_client.delete_collection(collection_name=collection_name)
+        return await self.vectordb_client.delete_collection(collection_name=collection_name)
 
-    def get_vector_db_info(self, project_id: int):
+    async def get_vector_db_info(self, project_id: int):
         collection_name = self.create_collection_name(project_id=project_id)
-        collection_info = self.vectordb_client.get_collection_info(
+        collection_info = await self.vectordb_client.get_collection_info(
             collection_name=collection_name)
 
         return json.loads(
             json.dumps(collection_info, default=lambda x: x.__dict__)
         )
 
-    def index_into_vector_db(self, project_id: int, chunks: List[DataChunk],
-                             chunk_ids: List[int],
-                             do_reset: bool = False):
+    async def index_into_vector_db(self, project_id: int, chunks: List[DataChunk],
+                                   chunk_ids: List[int],
+                                   do_reset: bool = False):
 
         collection_name = self.create_collection_name(project_id=project_id)
 
         texts = [c.chunk_text for c in chunks]
         metadata = [c.chunk_metadata for c in chunks]
-        vectors = [
-            self.embedding_model.get_embedding(
-                text=text, document_type=DocumentTypeEnums.DOCUMENT.value)
-            for text in texts
-        ]
+        vectors = self.embedding_model.get_embedding(
+            text=texts, document_type=DocumentTypeEnums.DOCUMENT.value)
 
-        _ = self.vectordb_client.create_collection(
+        _ = await self.vectordb_client.create_collection(
             collection_name=collection_name,
             embedding_dim=self.embedding_model.embedding_size,
             do_reset=do_reset
         )
 
-        _ = self.vectordb_client.insert_batch(
+        _ = await self.vectordb_client.insert_batch(
             collection_name=collection_name,
             vectors=vectors,
             texts=texts,
@@ -70,18 +71,25 @@ class NLPController(BaseController):
 
         return True
 
-    def search_vector_db_collection(self, project_id: int, text: str, limit: int = 10):
+    async def search_vector_db_collection(self, project_id: int, text: str, limit: int = 10):
 
         collection_name = self.create_collection_name(project_id=project_id)
 
-        vector = self.embedding_model.get_embedding(
+        query_vector = None
+        vectors = self.embedding_model.get_embedding(
             text=text, document_type=DocumentTypeEnums.QUERY.value)
 
-        if not vector or len(vector) == 0:
+        if not vectors or len(vectors) == 0:
             return False
 
-        results = self.vectordb_client.search_by_vector(
-            vector=vector,
+        if isinstance(vectors, list):
+            query_vector = vectors[0]
+
+        if not query_vector:
+            return False
+
+        results = await self.vectordb_client.search_by_vector(
+            vector=query_vector,
             collection_name=collection_name,
             top_k=limit
         )
@@ -91,11 +99,11 @@ class NLPController(BaseController):
 
         return results
 
-    def answer_rag_question(self, project_id: int, query: str, limit: int = 10):
+    async def answer_rag_question(self, project_id: int, query: str, limit: int = 10):
 
         full_prompt, chat_history, answer = None, None, None
 
-        retrieved_documents = self.search_vector_db_collection(
+        retrieved_documents = await self.search_vector_db_collection(
             project_id=project_id,
             text=query,
             limit=limit
