@@ -72,9 +72,6 @@ class GoogleProvider(LLMInterface):
             }
         )
 
-        print(chat_history)
-        print(self.generation_model_id)
-
         if not response or not response.text:
             self.logger.error("Error in Gemini text generation response")
             return None
