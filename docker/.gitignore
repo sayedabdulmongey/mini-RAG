@@ -1,2 +1,5 @@
-mongodb
-.env
+.env.*
+!.env.example.*
+alembic.ini
+alembic.*.ini
+!alembic.example.ini

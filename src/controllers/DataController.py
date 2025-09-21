@@ -32,11 +32,11 @@ class DataController(BaseController):
 
         if file.content_type not in self.app_settings.FILE_ALLOWED_TYPES:
             return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value, file.content_type
-        
+
         # file.size >> byte , file_allowed_size >> mega byte
         if file.size > self.app_settings.FILE_ALLOWED_SIZE*self.size_convert:
             return False, ResponseSignal.FILE_SIZE_EXCEEDED.value, file.content_type
-        
+
         return True, ResponseSignal.FILE_UPLOAD_SUCCESS.value, file.content_type
 
     def generate_unique_filepath(self, file: UploadFile, project_id: str):
@@ -55,9 +55,9 @@ class DataController(BaseController):
             random_key = self.generate_random_string()
             file_path = os.path.join(
                 project_dir,
-                f"{random_key}_{file.filename}"
+                f"{random_key}_{file_name}"
             )
-        return file_path, f'{random_key}_{file.filename}'
+        return file_path, f'{random_key}_{file_name}'
 
     def clean_filename(self, filename: str):
         '''

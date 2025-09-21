@@ -169,7 +169,6 @@ async def process_func(request: Request, project_id: int, process_request: Proce
     for asset_id, file_id in project_file_ids.items():
 
         file_content = process_controller.get_file_content(file_id)
-
         if file_content is None:
             logger.error(f"Error in processing file : {file_id}")
             continue

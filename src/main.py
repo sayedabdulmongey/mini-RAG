@@ -15,6 +15,8 @@ from models import ProjectModel, ChunkModel
 
 from controllers import NLPController
 
+from utils import setup_metrics
+
 
 async def startup_spam():
 
@@ -97,6 +99,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+setup_metrics(app)
 
 app.include_router(base.base_router)
 app.include_router(data.data_router)

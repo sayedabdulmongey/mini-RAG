@@ -50,7 +50,6 @@ class ProcessController(BaseController):
             self.project_path,
             file_id
         )
-
         if not os.path.exists(self.file_path):
             return None
 
