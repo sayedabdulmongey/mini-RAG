@@ -121,7 +121,7 @@ services:
 
   # PostgreSQL Exporter for Postgres metrics to Prometheus (does not store any persistent data)
   postgres_exporter:
-    image: bitnami/postgres-exporter:0.17.1
+    image: soldevelo/postgres-exporter:0.17.1
     container_name: postgres_exporter
     ports:
       - "9187:9187"
